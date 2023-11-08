@@ -7,7 +7,7 @@ interface RootState {
   accessToken: string;
   userData: UserData | null;
   userEmail: string;
-  dailySalesOverview: DailySalesOverviewData | [];
+  dailySalesOverview: DailySalesOverviewData | null;
   selectedDay: number;
   selectedColumns: string[];
   dailySalesSkuList: DailySalesSkuListData | null;

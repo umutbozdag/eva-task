@@ -11,11 +11,11 @@ export interface DailySalesSkuListData {
 export interface DailySalesSkuDataItem {
   selectedDate: string;
   TotalSale: number;
-  skuList: SkuListEntity[];
+  skuList: DailySalesSkuListEntity[];
   selectedDate2: string;
   TotalSale2: number;
 }
-export interface SkuListEntity {
+export interface DailySalesSkuListEntity {
   sku: string;
   productName: string;
   qty: number;
@@ -24,6 +24,7 @@ export interface SkuListEntity {
   refundPercantage: number;
   qty2: number;
   amount2: number;
+  refundRate?: number;
 }
 
 export interface DailySalesSkuListRequestBody {

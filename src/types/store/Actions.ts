@@ -1,9 +1,8 @@
-import { ActionContext, ActionTree, Commit } from "vuex";
+import { ActionContext } from "vuex";
 import RootState, { DayOptionsEnum } from "./State";
 import { UserData } from "../api/UserDataTypes";
 import { DailySalesOverviewData } from "../api/DailySalesOverviewTypes";
-import { SkuListRefundRateRequestBody, SkuListRefundRateResponse } from "../api/SkuListRefundRateTypes";
-import { AxiosResponse } from "axios";
+import { SkuListRefundRateRequestBody } from "../api/SkuListRefundRateTypes";
 
 export enum ActionTypes {
   LOGIN = "login",
@@ -20,7 +19,7 @@ type Actions = {
   [ActionTypes.LOGIN](
     context: ActionContext<RootState, RootState>,
     data: { email: string; password: string }
-  ): Promise<string>;
+  ): Promise<string | undefined>;
   [ActionTypes.LOGOUT](context: ActionContext<RootState, RootState>): void;
   [ActionTypes.FETCH_USER_DATA](
     context: ActionContext<RootState, RootState>

@@ -5,16 +5,16 @@ export interface SkuListRefundRateResponse {
   Data: SkuRefundRateData;
 }
 export interface SkuRefundRateData {
-  item?: ItemEntity[] | null;
+  item?: SkuRefundRateItemEntity[] | null;
 }
-export interface ItemEntity {
+export interface SkuRefundRateItemEntity {
   sku: string;
   refundRate: number;
 }
 
 export interface SkuListRefundRateRequestBody {
-  marketplace: string;
-  sellerId: string;
+  marketplace?: string;
+  sellerId?: string;
   skuList?: string[] | null;
   requestedDay: number;
 }
