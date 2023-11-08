@@ -32,7 +32,7 @@ class ChartAdapter {
             return {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              y: sale[key.name],
+              y: sale[xAxisKey.name],
               custom: {
                 totalSales: sale.fbaAmount + sale.fbmAmount,
                 shipping: sale.fbaShippingAmount,
