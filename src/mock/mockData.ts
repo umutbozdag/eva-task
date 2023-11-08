@@ -376,7 +376,6 @@ const mockData = {
         qty2: 75,
         amount2: 1000,
       },
-      // Add more skuList items as needed
     ],
     selectedDate2: "2023-11-07",
     TotalSale2: 6000,

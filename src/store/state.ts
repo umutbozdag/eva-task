@@ -1,7 +1,7 @@
 import RootState, { DayOptionsEnum } from "@/types/store/State";
 
 const state: RootState = {
-  accessToken: "", // Store the access token here
+  accessToken: "",
   userData: null,
   userEmail: "",
   dailySalesOverview: null,

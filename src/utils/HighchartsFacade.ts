@@ -137,7 +137,6 @@ export default class HighchartsFacade {
     return {
       cursor: "pointer",
       allowPointSelect: false,
-      // pointWidth: 25,
       states: { select: { enabled: false } },
       dataLabels: { format: `${this.currencyValue}{y}` },
       point: this.createPointEvents(),
