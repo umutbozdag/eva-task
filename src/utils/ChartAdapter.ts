@@ -19,15 +19,6 @@ const xAxisKeys: ChartAdapterSeriesItem[] = [
   },
 ];
 
-const mockData = [
-  { x: 0, y: 10 },
-  { x: 1, y: 20 },
-  { x: 2, y: 15 },
-  { x: 3, y: 25 },
-  { x: 4, y: 1 },
-  { x: 5, y: 1 },
-];
-
 class ChartAdapter {
   getSeries(data: DailySalesOverviewItemEntity[]): ChartAdapterSeriesObject[] {
     const getSeriesResult: ChartAdapterSeriesObject[] = [];
@@ -35,7 +26,22 @@ class ChartAdapter {
       const seriesObject: ChartAdapterSeriesObject = {
         name: xAxisKey.label,
         legendColor: "black",
-        data: mockData as any,
+        data:
+          data &&
+          data.map((sale: DailySalesOverviewItemEntity) => {
+            return {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              y: sale[key.name],
+              custom: {
+                totalSales: sale.fbaAmount + sale.fbmAmount,
+                shipping: sale.fbaShippingAmount,
+                profit: sale.profit,
+                fbaSales: sale.fbaAmount,
+                fbmSales: sale.fbmAmount,
+              },
+            };
+          }),
       };
       getSeriesResult.push(seriesObject);
     });
