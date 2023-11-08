@@ -33,8 +33,8 @@ const isOpen = ref(false);
 const selectedDay: ComputedRef<DayOptionsEnum> = computed(() => store.state.selectedDay)
 const handleChangeDay = async (day: number) => {
   if (day === selectedDay.value) {
-    isOpen.value = false
-    return
+    isOpen.value = false;
+    return;
   }
   store.dispatch(ActionTypes.SET_SELECTED_DAY, day);
   isOpen.value = false;
