@@ -4,7 +4,7 @@ import {
   ChartAdapterSeriesObject,
 } from "@/types/chart/ChartAdapterTypes";
 
-const keys: ChartAdapterSeriesItem[] = [
+const xAxisKeys: ChartAdapterSeriesItem[] = [
   {
     name: "profit",
     label: "Profit",
@@ -19,29 +19,23 @@ const keys: ChartAdapterSeriesItem[] = [
   },
 ];
 
+const mockData = [
+  { x: 0, y: 10 },
+  { x: 1, y: 20 },
+  { x: 2, y: 15 },
+  { x: 3, y: 25 },
+  { x: 4, y: 1 },
+  { x: 5, y: 1 },
+];
+
 class ChartAdapter {
-  getSeries(data: DailySalesOverviewItemEntity[]) {
+  getSeries(data: DailySalesOverviewItemEntity[]): ChartAdapterSeriesObject[] {
     const getSeriesResult: ChartAdapterSeriesObject[] = [];
-    console.log(data);
-    keys.forEach((key) => {
+    xAxisKeys.forEach((xAxisKey) => {
       const seriesObject: ChartAdapterSeriesObject = {
-        name: key.label,
-        legendColor: 'black',
-        data: data && data.map((sale: DailySalesOverviewItemEntity) => {
-          return {
-            // TODO: remove ts ignore
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            y: sale[key.name],
-            custom: {
-              totalSales: sale.fbaAmount + sale.fbmAmount,
-              shipping: sale.fbaShippingAmount,
-              profit: sale.profit,
-              fbaSales: sale.fbaAmount,
-              fbmSales: sale.fbmAmount,
-            },
-          };
-        }),
+        name: xAxisKey.label,
+        legendColor: "black",
+        data: mockData as any,
       };
       getSeriesResult.push(seriesObject);
     });
@@ -49,7 +43,9 @@ class ChartAdapter {
     return getSeriesResult;
   }
 
-  getCategories(data: DailySalesOverviewItemEntity[]) {
+  getCategories(
+    data: DailySalesOverviewItemEntity[]
+  ): DailySalesOverviewItemEntity["date"][] {
     return data && data.map((sale: DailySalesOverviewItemEntity) => sale.date);
   }
 }
