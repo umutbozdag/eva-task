@@ -1,4 +1,5 @@
 import {
+  DailySalesSkuListEntity,
   DailySalesSkuListRequestBody,
   DailySalesSkuListResponse,
 } from "@/types/api/DailySalesSkuListTypes";
@@ -13,6 +14,7 @@ import endpoints from "@/api/endpoints";
 import { ActionTree } from "vuex";
 import RootState from "@/types/store/State";
 import {
+  UserDataStoreEntity,
   UserInformationRequestBody,
   UserInformationResponse,
 } from "@/types/api/UserDataTypes";
@@ -22,15 +24,18 @@ import {
 } from "@/types/api/DailySalesOverviewTypes";
 import router from "@/router";
 import { MutationTypes } from "@/types/store/Mutations";
-import mockData from "@/mock/mockData";
 import {
   SkuListRefundRateRequestBody,
   SkuListRefundRateResponse,
+  SkuRefundRateItemEntity,
 } from "../types/api/SkuListRefundRateTypes";
+import { isAxiosError } from "@/utils/isAxiosError";
 
 const actions: ActionTree<RootState, RootState> & Actions = {
   async [ActionTypes.LOGIN]({ commit }, { email, password }) {
     try {
+      commit(MutationTypes.SET_IS_LOADING, true);
+
       const requestBody: OAUTHTokenRequestBody = {
         Email: email,
         Password: password,
@@ -47,29 +52,32 @@ const actions: ActionTree<RootState, RootState> & Actions = {
 
       const accessToken = response.data.Data.AccessToken;
       sessionStorage.setItem("access_token", accessToken);
+      sessionStorage.setItem("email", email);
 
       commit(MutationTypes.SET_ACCESS_TOKEN, accessToken);
       commit(MutationTypes.SET_USER_EMAIL, email);
+      commit(MutationTypes.SET_IS_LOADING, false);
 
       router.push({ name: "Home" });
 
       return accessToken;
-    } catch (error: any) {
-      // TODO: show notify
-      console.log("Login failed:", error.response.data.ApiStatusMessage);
-      throw error;
+    } catch (error: unknown) {
+      if (isAxiosError<OAUTHTokenResponse>(error)) {
+        throw error;
+      }
     }
   },
   async [ActionTypes.LOGOUT]({ commit }) {
-    commit("clearAccessToken");
+    commit(MutationTypes.CLEAR_ACCESS_TOKEN);
     sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("email");
     router.go(0);
   },
   async [ActionTypes.FETCH_USER_DATA]({ commit, state }) {
     try {
-      // TODO: update email
+      commit(MutationTypes.SET_USER_EMAIL, sessionStorage.getItem("email"));
       const requestBody: UserInformationRequestBody = {
-        email: state.userEmail || "homework@eva.guru",
+        email: state.userEmail,
       };
       const response: AxiosResponse<UserInformationResponse> = await api.post(
         endpoints.USER_INFORMATION,
@@ -87,14 +95,14 @@ const actions: ActionTree<RootState, RootState> & Actions = {
   },
   async [ActionTypes.GET_DAILY_SALES_OVERVIEW]({ state, commit }) {
     try {
-      let userInformationStore = null;
+      let userInformationStore: UserDataStoreEntity | null = null;
       if (state.userData && state.userData.store) {
         userInformationStore = state.userData.store[0];
       }
 
       const requestBody: DailySalesOverviewRequestBody = {
-        marketplace: userInformationStore!.marketplaceName,
-        sellerId: userInformationStore!.storeId,
+        marketplace: userInformationStore?.marketplaceName || "",
+        sellerId: userInformationStore?.storeId || "",
         day: state.selectedDay,
         excludeYoYData: true,
         requestStatus: 0,
@@ -124,7 +132,7 @@ const actions: ActionTree<RootState, RootState> & Actions = {
     await dispatch(ActionTypes.GET_DAILY_SALES_SKU_LIST, state.selectedColumns);
   },
   async [ActionTypes.GET_DAILY_SALES_SKU_LIST]({ commit, state, dispatch }) {
-    let userInformationStore = null;
+    let userInformationStore: UserDataStoreEntity | null = null;
     if (state.userData && state.userData.store) {
       userInformationStore = state.userData.store[0];
     }
@@ -134,21 +142,42 @@ const actions: ActionTree<RootState, RootState> & Actions = {
 
     const requestBody: DailySalesSkuListRequestBody = {
       isDaysCompare,
-      marketplace: userInformationStore!.marketplaceName,
-      sellerId: userInformationStore!.storeId,
-      pageSize: state.itemsPerPage, // TODO: Add pagination to table,
+      marketplace: userInformationStore?.marketplaceName || "",
+      sellerId: userInformationStore?.storeId || "",
+      pageSize: state.itemsPerPage,
       pageNumber,
       salesDate: state.selectedColumns[0],
       salesDate2: isDaysCompare ? state.selectedColumns[1] : "",
     };
 
     const baseSkuRefundRateRequestBody = {
-      marketplace: userInformationStore!.marketplaceName,
+      marketplace: userInformationStore?.marketplaceName,
       requestedDay: state.selectedDay,
-      sellerId: userInformationStore!.storeId,
+      sellerId: userInformationStore?.storeId,
     };
     let isFetchedBefore = false;
     let skuRefundRateRequestBody: SkuListRefundRateRequestBody;
+
+    const mapSkuRefundRatesToSkuList = (
+      refundRates: SkuRefundRateItemEntity[],
+      skuList: DailySalesSkuListEntity[]
+    ) => {
+      return skuList.map((item) => {
+        const idx = refundRates.findIndex(
+          (refundRate) => item.sku === refundRate.sku
+        );
+        if (idx > -1) {
+          return {
+            ...item,
+            refundRate: refundRates[idx].refundRate,
+          };
+        }
+
+        return {
+          ...item,
+        };
+      });
+    };
     if (state.currentPage % 3 === 0 && isFetchedBefore) {
       const response: AxiosResponse<DailySalesSkuListResponse> = await api.post(
         endpoints.DAILY_SALES_SKU_LIST,
@@ -171,6 +200,13 @@ const actions: ActionTree<RootState, RootState> & Actions = {
           ActionTypes.GET_SKU_REFUND_RATE,
           skuRefundRateRequestBody
         );
+
+        if (state.skuRefundRateData && state.skuRefundRateData.item) {
+          state.dailySalesSkuList.item.skuList = mapSkuRefundRatesToSkuList(
+            state.skuRefundRateData.item,
+            data.item.skuList
+          );
+        }
       } else {
         commit(MutationTypes.SET_DAILY_SALES_SKU_LIST, data);
       }
@@ -180,9 +216,8 @@ const actions: ActionTree<RootState, RootState> & Actions = {
         requestBody
       );
 
-      // TODO: update
       const data = response.data.Data;
-      commit(MutationTypes.SET_DAILY_SALES_SKU_LIST, mockData);
+      commit(MutationTypes.SET_DAILY_SALES_SKU_LIST, data);
 
       skuRefundRateRequestBody = {
         skuList: data.item.skuList.map((item) => item.sku),
@@ -190,9 +225,18 @@ const actions: ActionTree<RootState, RootState> & Actions = {
       };
 
       await dispatch(ActionTypes.GET_SKU_REFUND_RATE, skuRefundRateRequestBody);
+
+      if (
+        state.skuRefundRateData &&
+        state.skuRefundRateData.item &&
+        state.dailySalesSkuList
+      ) {
+        state.dailySalesSkuList.item.skuList = mapSkuRefundRatesToSkuList(
+          state.skuRefundRateData.item,
+          data.item.skuList
+        );
+      }
       isFetchedBefore = true;
-      // TODO: update
-      // commit(MutationTypes.SET_DAILY_SALES_SKU_LIST, data);
     }
   },
 

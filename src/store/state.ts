@@ -4,7 +4,7 @@ const state: RootState = {
   accessToken: "", // Store the access token here
   userData: null,
   userEmail: "",
-  dailySalesOverview: [],
+  dailySalesOverview: null,
   selectedDay: DayOptionsEnum.OneMonth,
   selectedColumns: [],
   dailySalesSkuList: null,
