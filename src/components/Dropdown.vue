@@ -24,6 +24,7 @@ import { ComputedRef, computed, inject, ref } from 'vue';
 import days from '../config/days';
 import { useStore } from 'vuex';
 import { DayOptionsEnum } from '@/types/store/State';
+import { ActionTypes } from '@/types/store/Actions';
 
 const store = useStore();
 
@@ -35,9 +36,9 @@ const handleChangeDay = async (day: number) => {
     isOpen.value = false
     return
   }
-  store.dispatch('setSelectedDay', day);
+  store.dispatch(ActionTypes.SET_SELECTED_DAY, day);
   isOpen.value = false;
-  await store.dispatch('getDailySalesOverview');
+  await store.dispatch(ActionTypes.GET_DAILY_SALES_OVERVIEW);
 }
 
 </script>

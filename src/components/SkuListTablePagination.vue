@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { ActionTypes } from "@/types/store/Actions";
 import { MutationTypes } from "@/types/store/Mutations";
 import { computed } from "vue";
 import { useStore } from "vuex";
@@ -33,14 +34,14 @@ const totalPages = computed(() => store.getters.totalPages);
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     store.commit(MutationTypes.SET_CURRENT_PAGE, currentPage.value + 1);
-    store.dispatch("getDailySalesSkuList");
+    store.dispatch(ActionTypes.GET_DAILY_SALES_SKU_LIST);
   }
 };
 
 const prevPage = () => {
   if (currentPage.value > 1) {
     store.commit(MutationTypes.SET_CURRENT_PAGE, currentPage.value - 1);
-    store.dispatch("getDailySalesSkuList");
+    store.dispatch(ActionTypes.GET_DAILY_SALES_SKU_LIST);
   }
 };
 </script>

@@ -2,24 +2,20 @@
   <router-view />
 </template>
 <script setup lang="ts">
-import { useNotification } from "@kyvg/vue3-notification";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
 import router from "@/router";
+import { ActionTypes } from "./types/store/Actions";
+import { MutationTypes } from "./types/store/Mutations";
 
-const notification = useNotification()
 const store = useStore();
 onMounted(async () => {
   const accessToken = sessionStorage.getItem("access_token");
   if (accessToken) {
-    store.commit("setAccessToken", accessToken);
-    await store.dispatch('fetchUserData');
-    await store.dispatch("getDailySalesOverview");
-    router.push({ name: 'Home' })
+    store.commit(MutationTypes.SET_ACCESS_TOKEN, accessToken);
+    await store.dispatch(ActionTypes.FETCH_USER_DATA);
+    await store.dispatch(ActionTypes.GET_DAILY_SALES_OVERVIEW);
+    router.push({ name: 'Home' });
   }
-  notification.notify({
-    title: "Vue 3 notification 🎉",
-  });
 })
 </script>
-<style lang="scss"></style>

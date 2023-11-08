@@ -15,12 +15,13 @@
 <script lang="ts" setup>
 import Chart from '@/components/Chart.vue';
 import SkuListTable from '@/components/SkuListTable.vue';
-import { computed, onMounted, ref } from 'vue';
-import { useStore } from 'vuex';
+import { computed } from 'vue';
+import { Store, useStore } from 'vuex';
 import Loading from 'vue3-loading-overlay';
 import 'vue3-loading-overlay/dist/vue3-loading-overlay.css';
+import RootState from '@/types/store/State';
 
-const store = useStore();
+const store: Store<RootState> = useStore();
 
 const isLoading = computed(() => store.state.isLoading);
 const hasSelectedColumns = computed(() => store.state.selectedColumns.length > 0);

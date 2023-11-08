@@ -8,14 +8,14 @@
             <form>
               <div class="relative w-full mb-6">
                 <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="grid-password">Email</label>
-                <input type="email" v-model="email"
+                <input autocomplete="email" type="email" v-model="email"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                   placeholder="Email">
               </div>
               <div class="relative w-full mb-3">
                 <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                   for="grid-password">Password</label>
-                <input type="password" v-model="password"
+                <input autocomplete="current-password" type="password" v-model="password"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                   placeholder="Password">
               </div>
@@ -35,7 +35,8 @@
 
 <script setup lang="ts">
 import router from '@/router';
-import { onMounted, ref } from 'vue';
+import { ActionTypes } from '@/types/store/Actions';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 
 
@@ -45,18 +46,15 @@ const store = useStore();
 
 const handleLogin = async () => {
   try {
-    // TODO: update later
-    await store.dispatch('login', {
-      email: email.value || 'homework@eva.guru',
-      password: password.value || 'Homeworkeva1**',
+    await store.dispatch(ActionTypes.LOGIN, {
+      email: email.value,
+      password: password.value,
     });
 
-    // accessToken is available here, and you can use it to fetch user data
-    await store.dispatch('fetchUserData');
-    await store.dispatch('getDailySalesOverview');
+    await store.dispatch(ActionTypes.FETCH_USER_DATA);
+    await store.dispatch(ActionTypes.GET_DAILY_SALES_OVERVIEW);
 
-    // Do something with the user data
-    router.push({ name: 'Home' })
+    router.push({ name: 'Home' });
   } catch (error) {
     console.error('Component handling of login error:', error);
   }
