@@ -39,10 +39,10 @@
                 </td>
               </tr>
             </tbody>
-            <div class="text-center w-full" v-else>
-              No data
-            </div>
           </table>
+        </div>
+        <div v-if="!displayedTableData.skuList.length" class="text-center p-8 bg-gray-200">
+          No data
         </div>
         <div class="text-right mt-4">
           <sku-list-table-pagination />
