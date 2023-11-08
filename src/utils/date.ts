@@ -8,19 +8,18 @@ const daysOfWeek = [
   "Saturday",
 ];
 
-function formatDate(inputDate: string | Date | number) {
+function formatDate(inputDate: string | Date | number): string {
   const date = new Date(inputDate);
 
   const dayOfWeek = daysOfWeek[date.getDay()];
 
   const fullDate = getDate(date);
 
-
   const formattedDate = `${dayOfWeek}, ${fullDate}`;
   return formattedDate;
 }
 
-function getDayName(inputDate: string | Date) {
+function getDayName(inputDate: string | Date): string {
   const date = new Date(inputDate);
 
   const dayOfWeek = daysOfWeek[date.getDay()];
@@ -28,7 +27,7 @@ function getDayName(inputDate: string | Date) {
   return dayOfWeek;
 }
 
-function getDate(inputDate: string | Date) {
+function getDate(inputDate: string | Date): string {
   const date = new Date(inputDate);
 
   const day = date.getDate();
